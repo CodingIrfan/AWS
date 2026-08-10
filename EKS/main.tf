@@ -7,10 +7,20 @@ module "eks" {
 
   # Existing VPC
   vpc_id     = var.vpc_id
-  subnet_ids = var.private_subnet_ids
+  subnet_ids = var.public_subnet_ids
 
   # EKS API endpoint
   endpoint_public_access = true
+
+  # enable creator access permission
+  enable_cluster_creator_admin_permissions = true
+
+  # access entries
+  access_entries = {
+    eks_admin = {
+      principal_arn = "arn:aws:iam::953146140760:user/eks-admin"
+    }
+  }
 
   # EKS managed add-ons
   addons = {
@@ -34,6 +44,13 @@ module "eks" {
 
     aws-ebs-csi-driver = {
       most_recent = true
+
+      pod_identity_association = [
+        {
+          role_arn        = aws_iam_role.ebs_csi.arn
+          service_account = "ebs-csi-controller-sa"
+        }
+      ]
     }
   }
 
@@ -48,7 +65,7 @@ module "eks" {
       max_size     = 3
       desired_size = 2
 
-      subnet_ids = var.private_subnet_ids
+      subnet_ids = var.public_subnet_ids
 
       capacity_type = "ON_DEMAND"
 
