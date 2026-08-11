@@ -2,6 +2,11 @@ variable "aws_region" {
   description = "Name of the region"
   type       = string
 } 
+
+variable "account_id"{
+  description = "AWS Account ID"
+  type        = string 
+}
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
