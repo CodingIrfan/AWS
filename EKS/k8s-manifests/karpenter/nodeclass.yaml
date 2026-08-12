@@ -1,0 +1,30 @@
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: eks-cluster-dev-nodeclass
+spec:
+  amiFamily: AL2023
+
+  role: eks-cluster-dev-karpenter-node
+
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "eks-cluster-dev"
+
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "eks-cluster-dev"
+
+  amiSelectorTerms:
+    - alias: al2023@latest
+
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 30Gi
+        volumeType: gp3
+        encrypted: true
+
+  tags:
+    Environment: dev
+    ManagedBy: Karpenter

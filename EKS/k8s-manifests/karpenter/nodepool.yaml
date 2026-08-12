@@ -1,0 +1,46 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: eks-cluster-dev-nodepool
+spec:
+  template:
+    metadata:
+      labels:
+        workload: general
+
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: eks-cluster-dev-nodeclass
+
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values:
+            - amd64
+
+        - key: kubernetes.io/os
+          operator: In
+          values:
+            - linux
+
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values:
+            - on-demand
+
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values:
+            - t3.micro
+            - t3.small
+            - t3.medium
+            - t2.micro
+
+  limits:
+    cpu: "10"
+
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 30s
