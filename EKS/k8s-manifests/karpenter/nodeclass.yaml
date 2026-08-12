@@ -3,6 +3,10 @@ kind: EC2NodeClass
 metadata:
   name: eks-cluster-dev-nodeclass
 spec:
+  metadataOptions:
+    httpEndpoint: enabled
+    httpTokens: required
+    httpPutResponseHopLimit: 2
   amiFamily: AL2023
 
   role: eks-cluster-dev-karpenter-node
