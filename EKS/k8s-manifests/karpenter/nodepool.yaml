@@ -35,8 +35,6 @@ spec:
           values:
             - t3.micro
             - t3.small
-            - t3.medium
-            - t2.micro
 
   limits:
     cpu: "10"
