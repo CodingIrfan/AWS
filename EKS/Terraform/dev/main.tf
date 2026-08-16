@@ -20,6 +20,11 @@ module "eks" {
     eks_admin = {
       principal_arn = "arn:aws:iam::953146140760:user/eks-admin"
     }
+
+    karpenter_node = {
+    principal_arn = "arn:aws:iam::953146140760:role/eks-cluster-dev-karpenter-node"
+    type          = "EC2_LINUX"
+    }
   }
 
   # EKS managed add-ons
@@ -57,10 +62,17 @@ module "eks" {
   # Managed node group for system workloads
   eks_managed_node_groups = {
     system = {
+
+      metadata_options = {
+        http_endpoint               = "enabled"
+        http_tokens                 = "required"
+        http_put_response_hop_limit = 2
+      }
+
       name = "system-components"
 
+      # instance_types = ["c71-flex.large"]
       instance_types = ["t3.small"]
-
       min_size     = 2
       max_size     = 3
       desired_size = 2
