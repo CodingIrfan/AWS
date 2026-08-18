@@ -1,40 +1,3 @@
-data "aws_iam_policy_document" "ebs_csi_assume_role" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "sts:AssumeRole",
-      "sts:TagSession"
-    ]
-
-    principals {
-      type = "Service"
-      identifiers = [
-        "pods.eks.amazonaws.com"
-      ]
-    }
-  }
-}
-
-resource "aws_iam_role" "ebs_csi" {
-  name = "${var.cluster_name}-ebs-csi"
-
-  assume_role_policy = data.aws_iam_policy_document.ebs_csi_assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "ebs_csi" {
-  role       = aws_iam_role.ebs_csi.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicyV2"
-}
-
-#
-# Karpenter IAM
-#
-
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
-
 #
 # ---------------------------------------------------------
 # Karpenter Node Role
@@ -92,6 +55,7 @@ resource "aws_iam_role_policy_attachment" "karpenter_node_ecr" {
 #
 # Useful for troubleshooting / SSM access to nodes.
 #
+
 resource "aws_iam_role_policy_attachment" "karpenter_node_ssm" {
   role       = aws_iam_role.karpenter_node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -557,8 +521,6 @@ resource "aws_iam_policy" "karpenter_controller" {
       # Zonal Shift
       # ---------------------------------------------------
       #
-      # Current Karpenter versions support this integration.
-      #
 
       {
         Sid    = "AllowZonalShiftStatusReadOnly"
@@ -602,7 +564,7 @@ resource "aws_eks_pod_identity_association" "karpenter" {
 
   role_arn = aws_iam_role.karpenter_controller.arn
 
-  depends_on = [ 
+  depends_on = [
     module.eks
   ]
 }
